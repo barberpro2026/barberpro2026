@@ -45,6 +45,53 @@ const FadeIn = ({ children, delay = 0, className = "" }: { children: ReactNode, 
   );
 };
 
+// --- COMPONENTE VIDEO YOUTUBE-STYLE ---
+// Este componente maneja la carga diferida del video para evitar problemas en móviles
+const VideoPlayer = () => {
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  return (
+    <div className="relative w-full max-w-4xl mx-auto aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border-4 border-white mb-8 group">
+      {!isPlaying ? (
+        // --- ESTADO INICIAL: PORTADA + BOTÓN PLAY ---
+        <div 
+          className="w-full h-full cursor-pointer relative"
+          onClick={() => setIsPlaying(true)}
+        >
+          <img 
+            src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+            alt="Ver Video Demo" 
+            className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+          />
+          {/* Capa oscura para resaltar el botón */}
+          <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+            {/* Botón Play */}
+            <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-full flex items-center justify-center shadow-2xl backdrop-blur-sm animate-pulse group-hover:scale-110 transition-transform">
+              <Play className="w-8 h-8 sm:w-10 sm:h-10 text-slate-900 ml-1 fill-slate-900" />
+            </div>
+          </div>
+          <div className="absolute bottom-4 left-0 right-0 text-center">
+            <span className="bg-black/60 text-white px-4 py-1 rounded-full text-sm font-medium">
+              Haz clic para ver el video
+            </span>
+          </div>
+        </div>
+      ) : (
+        // --- ESTADO REPRODUCIENDO: VIDEO REAL ---
+        <video 
+          className="w-full h-full object-cover" 
+          controls 
+          autoPlay 
+          playsInline // CRUCIAL para iPhone
+        >
+          <source src="https://res.cloudinary.com/djbcgcmma/video/upload/v1770854111/barberia_landing_pague_etppr5.mp4" type="video/mp4" />
+          Tu navegador no soporta el tag de video.
+        </video>
+      )}
+    </div>
+  );
+};
+
 // --- WIDGET DE DEMOSTRACIÓN DE CHAT ---
 const ChatDemoWidget = ({ phoneNumber }: { phoneNumber: string }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -78,10 +125,10 @@ const ChatDemoWidget = ({ phoneNumber }: { phoneNumber: string }) => {
       const msg = script[i];
       if (msg.role === 'bot' || msg.role === 'cta') {
         setIsTyping(true);
-        await new Promise(r => setTimeout(r, 800)); // Tiempo simulado de escritura
+        await new Promise(r => setTimeout(r, 800));
         setIsTyping(false);
         setMessages(prev => [...prev, msg]);
-        await new Promise(r => setTimeout(r, 600)); // Pausa de lectura
+        await new Promise(r => setTimeout(r, 600));
       } else {
         await new Promise(r => setTimeout(r, 1200));
         setMessages(prev => [...prev, msg]);
@@ -92,7 +139,7 @@ const ChatDemoWidget = ({ phoneNumber }: { phoneNumber: string }) => {
   const toggleChat = () => {
     setIsOpen(!isOpen);
     if (!isOpen && messages.length > 0) {
-      // Opcional: reiniciar chat al cerrar y abrir o mantener estado
+      // Opcional: reiniciar chat
     }
   };
 
@@ -100,7 +147,6 @@ const ChatDemoWidget = ({ phoneNumber }: { phoneNumber: string }) => {
     <div className="fixed bottom-24 right-6 z-50 flex flex-col items-end">
       {/* Ventana de Chat */}
       <div className={`mb-4 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200 transition-all duration-300 origin-bottom-right transform ${isOpen ? 'scale-100 opacity-100' : 'scale-0 opacity-0 pointer-events-none'}`}>
-        {/* Header */}
         <div className="bg-slate-900 p-4 flex justify-between items-center text-white">
           <div className="flex items-center gap-2">
             <div className="bg-green-500 p-1.5 rounded-full relative">
@@ -115,7 +161,6 @@ const ChatDemoWidget = ({ phoneNumber }: { phoneNumber: string }) => {
           <button onClick={toggleChat} className="hover:bg-slate-800 p-1 rounded transition-colors"><X size={18} /></button>
         </div>
         
-        {/* Cuerpo Chat */}
         <div ref={scrollRef} className="h-64 overflow-y-auto p-4 bg-slate-50 space-y-3">
           {messages.map((msg, idx) => (
             <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -123,7 +168,7 @@ const ChatDemoWidget = ({ phoneNumber }: { phoneNumber: string }) => {
                  <div className="w-full text-center mt-2">
                    <p className="text-sm text-slate-500 mb-2">{msg.text}</p>
                    <a 
-                     href={`https://wa.me/${phoneNumber}?text=${encodeURIComponent("Hola, quiero ver cómo funcionaría en mi negocio.")}`}
+                     href={`https://wa.me/${phoneNumber}?text=${encodeURIComponent("Hola, me gustaría probar el bot en mi barbería.")}`}
                      target="_blank" rel="noopener noreferrer"
                      className="bg-[#25D366] text-white text-sm font-bold py-2 px-4 rounded-full inline-flex items-center gap-1 hover:bg-[#20bd5a] transition-colors"
                    >
@@ -151,7 +196,6 @@ const ChatDemoWidget = ({ phoneNumber }: { phoneNumber: string }) => {
         </div>
       </div>
 
-      {/* Botón Flotante Trigger */}
       <button 
         onClick={toggleChat}
         className={`${isOpen ? 'bg-slate-700' : 'bg-amber-500 hover:bg-amber-400'} text-white p-4 rounded-full shadow-xl transition-all hover:scale-105 flex items-center justify-center relative group`}
@@ -167,7 +211,6 @@ const ChatDemoWidget = ({ phoneNumber }: { phoneNumber: string }) => {
     </div>
   );
 };
-
 
 // Tipos para los componentes
 interface ProblemCardProps {
@@ -190,25 +233,52 @@ const App = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // --- EFECTO PARA EL FAVICON (LOGO EN PESTAÑA) ---
+  // --- CONFIGURACIÓN SEO AVANZADA (META TAGS Y OPEN GRAPH) ---
   useEffect(() => {
-    // Busca el favicon existente o crea uno nuevo
+    // 1. Título y Favicon
+    document.title = "Barber Pro | Automatización para Barberías 24/7";
+    
     let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
     if (!link) {
       link = document.createElement('link');
       link.rel = 'icon';
       document.getElementsByTagName('head')[0].appendChild(link);
     }
-    // Asigna un emoji de tijeras como favicon (solución rápida y ligera)
-    // Para usar una imagen PNG real, reemplaza el href con la URL de tu imagen
     link.href = "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✂️</text></svg>";
-    document.title = "Barber Pro | Automatización para Barberías";
+
+    // 2. Función auxiliar para inyectar meta tags de forma segura
+    const updateMeta = (name: string, content: string, attribute: 'name' | 'property' = 'name') => {
+      let element = document.querySelector(`meta[${attribute}='${name}']`);
+      if (!element) {
+        element = document.createElement('meta');
+        element.setAttribute(attribute, name);
+        document.getElementsByTagName('head')[0].appendChild(element);
+      }
+      element.setAttribute('content', content);
+    };
+
+    // 3. Meta Tags de SEO (Google)
+    updateMeta('description', 'Automatiza tu barbería con Barber Pro. Responde mensajes, agenda citas y envía recordatorios por WhatsApp automáticamente las 24 horas. ¡Prueba el demo gratis!');
+    updateMeta('keywords', 'barbería, automatización whatsapp, bot para barberos, agenda citas, software barbería colombia, barber pro');
+
+    // 4. Open Graph (Vista previa en WhatsApp, Facebook, LinkedIn)
+    updateMeta('og:title', 'Barber Pro | Tu Recepcionista Virtual 24/7', 'property');
+    updateMeta('og:description', 'No pierdas más clientes por no responder. Automatiza tu agenda y citas por WhatsApp mientras tú cortas. Mira el demo aquí.', 'property');
+    updateMeta('og:image', 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80', 'property'); // Imagen de barbero trabajando
+    updateMeta('og:type', 'website', 'property');
+    
+    // 5. Twitter Cards
+    updateMeta('twitter:card', 'summary_large_image', 'name');
+    updateMeta('twitter:title', 'Barber Pro - Automatización para Barberías', 'name');
+    updateMeta('twitter:description', 'Agenda citas automáticamente por WhatsApp y deja de perder clientes.', 'name');
+    updateMeta('twitter:image', 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80', 'name');
+
   }, []);
 
   // --- NÚMERO DE CONTACTO ---
   const phoneNumber = "573217091411";
   
-  // Función optimizada para móviles: usa 'wa.me' que es el estándar oficial para deep-links
+  // Función optimizada para móviles: usa 'wa.me' que es el estándar oficial
   const getWhatsAppLink = (message: string) => {
     return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
   };
@@ -235,7 +305,7 @@ const App = () => {
           </div>
 
           <a 
-            href={getWhatsAppLink("Hola 👋 Me gustaría saber más sobre Barber Pro.")}
+            href={getWhatsAppLink("Hola 👋 Vi su página web y me gustaría más información sobre Barber Pro.")}
             target="_blank"
             rel="noopener noreferrer"
             className="bg-[#25D366] hover:bg-[#20bd5a] text-white px-5 py-2.5 rounded-full text-sm font-bold transition-all shadow-lg flex items-center gap-2"
@@ -445,29 +515,9 @@ const App = () => {
                Experiencia Real en 30 Segundos
              </h2>
              
-             {/* VIDEO CONTAINER MEJORADO */}
-             <div className="relative w-full max-w-4xl mx-auto aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border-4 border-white mb-8 group">
-                <video 
-                  className="w-full h-full object-cover" 
-                  controls
-                  playsInline
-                  preload="metadata"
-                  // IMAGEN DE PORTADA ACTUALIZADA (Más estilo Barber)
-                  poster="https://images.unsplash.com/photo-1621605815971-fbc98d665033?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
-                >
-                  <source src="https://res.cloudinary.com/djbcgcmma/video/upload/v1770854111/barberia_landing_pague_etppr5.mp4" type="video/mp4" />
-                  Tu navegador no soporta el tag de video.
-                </video>
-                
-                {/* Botón de Play Decorativo */}
-                <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/10 transition-colors">
-                  <div className="w-24 h-24 bg-white/90 rounded-full flex items-center justify-center shadow-2xl backdrop-blur-sm animate-pulse group-hover:scale-110 transition-transform">
-                    <Play className="w-10 h-10 text-slate-900 ml-1 fill-slate-900" />
-                  </div>
-                </div>
-             </div>
+             <VideoPlayer />
              
-             <p className="text-slate-500 text-sm max-w-xl mx-auto">
+             <p className="text-slate-500 text-sm max-w-xl mx-auto mt-8">
                * Este es un ejemplo de cómo el bot interactúa con tus clientes en tiempo real.
              </p>
           </FadeIn>
@@ -492,7 +542,7 @@ const App = () => {
 
               <div className="flex flex-col md:flex-row justify-center items-center gap-6">
                 <a 
-                  href={getWhatsAppLink("Hola 👋 Quiero ver una demostración de Barber Pro.")}
+                  href={getWhatsAppLink("Hola 👋 Me interesa lo que vi en la página web. Quiero automatizar mi barbería.")}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full md:w-auto bg-[#25D366] hover:bg-[#20bd5a] text-white text-xl font-bold py-5 px-10 rounded-xl shadow-xl shadow-green-600/20 flex items-center justify-center gap-3 transition-all transform hover:-translate-y-1"
@@ -524,7 +574,7 @@ const App = () => {
 
       {/* --- BOTÓN FLOTANTE PRINCIPAL --- */}
       <a 
-        href={getWhatsAppLink("Hola 👋 Tengo una consulta sobre Barber Pro.")}
+        href={getWhatsAppLink("Hola 👋 Tengo una duda sobre el servicio de Barber Pro.")}
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-6 right-6 bg-[#25D366] hover:bg-[#20bd5a] text-white p-4 rounded-full shadow-2xl z-40 transition-transform hover:scale-110 flex items-center justify-center animate-bounce-slow"
