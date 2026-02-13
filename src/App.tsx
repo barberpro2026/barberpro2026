@@ -123,7 +123,7 @@ const ChatDemoWidget = ({ phoneNumber }: { phoneNumber: string }) => {
                  <div className="w-full text-center mt-2">
                    <p className="text-sm text-slate-500 mb-2">{msg.text}</p>
                    <a 
-                     href={`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent("Hola, quiero ver cómo funcionaría en mi negocio.")}`}
+                     href={`https://wa.me/${phoneNumber}?text=${encodeURIComponent("Hola, quiero ver cómo funcionaría en mi negocio.")}`}
                      target="_blank" rel="noopener noreferrer"
                      className="bg-[#25D366] text-white text-sm font-bold py-2 px-4 rounded-full inline-flex items-center gap-1 hover:bg-[#20bd5a] transition-colors"
                    >
@@ -208,9 +208,9 @@ const App = () => {
   // --- NÚMERO DE CONTACTO ---
   const phoneNumber = "573217091411";
   
-  // Función optimizada para móviles (api.whatsapp.com en vez de wa.me)
+  // Función optimizada para móviles: usa 'wa.me' que es el estándar oficial para deep-links
   const getWhatsAppLink = (message: string) => {
-    return `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
+    return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
   };
 
   return (
@@ -279,7 +279,7 @@ const App = () => {
             </FadeIn>
             
             <FadeIn delay={300}>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start w-full sm:w-auto relative z-20">
                 <a 
                   href={getWhatsAppLink("Hola 👋 Me gustaría ver una demostración en mi celular.")}
                   target="_blank"
