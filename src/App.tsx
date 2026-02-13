@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, type ReactNode } from 'react';
-import { Scissors, Clock, XCircle, CheckCircle, ChevronRight, Shield, Phone, Play, MessageSquare, X, Bot } from 'lucide-react';
+import { Scissors, Clock, XCircle, CheckCircle, ChevronRight, Shield, Phone, Play, MessageSquare, Bot, X } from 'lucide-react';
 
 // --- COMPONENTE ICONO WHATSAPP OFICIAL (SVG) ---
 const WhatsAppIcon = ({ className }: { className?: string }) => (
@@ -52,7 +52,6 @@ const ChatDemoWidget = ({ phoneNumber }: { phoneNumber: string }) => {
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // --- SCRIPT ACTUALIZADO ---
   const script = [
     { role: 'bot', text: 'Hola 👋 gracias por escribir a BarberPro.' },
     { role: 'bot', text: 'Ayudamos a barberías a responder mensajes, agendar citas y confirmar clientes de forma automática por WhatsApp, las 24 horas.' },
@@ -124,7 +123,7 @@ const ChatDemoWidget = ({ phoneNumber }: { phoneNumber: string }) => {
                  <div className="w-full text-center mt-2">
                    <p className="text-sm text-slate-500 mb-2">{msg.text}</p>
                    <a 
-                     href={`https://wa.me/${phoneNumber}?text=${encodeURIComponent("Hola, quiero ver cómo funcionaría en mi negocio.")}`}
+                     href={`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent("Hola, quiero ver cómo funcionaría en mi negocio.")}`}
                      target="_blank" rel="noopener noreferrer"
                      className="bg-[#25D366] text-white text-sm font-bold py-2 px-4 rounded-full inline-flex items-center gap-1 hover:bg-[#20bd5a] transition-colors"
                    >
@@ -177,9 +176,9 @@ interface ProblemCardProps {
   desc: string;
 }
 
-// Interfaz corregida (quitamos desc que no se usaba)
 interface FeatureRowProps {
   title: string;
+  desc?: string;
 }
 
 const App = () => {
@@ -191,11 +190,27 @@ const App = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // --- EFECTO PARA EL FAVICON (LOGO EN PESTAÑA) ---
+  useEffect(() => {
+    // Busca el favicon existente o crea uno nuevo
+    let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'icon';
+      document.getElementsByTagName('head')[0].appendChild(link);
+    }
+    // Asigna un emoji de tijeras como favicon (solución rápida y ligera)
+    // Para usar una imagen PNG real, reemplaza el href con la URL de tu imagen
+    link.href = "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✂️</text></svg>";
+    document.title = "Barber Pro | Automatización para Barberías";
+  }, []);
+
   // --- NÚMERO DE CONTACTO ---
   const phoneNumber = "573217091411";
   
+  // Función optimizada para móviles (api.whatsapp.com en vez de wa.me)
   const getWhatsAppLink = (message: string) => {
-    return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    return `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
   };
 
   return (
@@ -221,6 +236,8 @@ const App = () => {
 
           <a 
             href={getWhatsAppLink("Hola 👋 Me gustaría saber más sobre Barber Pro.")}
+            target="_blank"
+            rel="noopener noreferrer"
             className="bg-[#25D366] hover:bg-[#20bd5a] text-white px-5 py-2.5 rounded-full text-sm font-bold transition-all shadow-lg flex items-center gap-2"
           >
             <WhatsAppIcon className="w-5 h-5" />
@@ -264,7 +281,9 @@ const App = () => {
             <FadeIn delay={300}>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start w-full sm:w-auto">
                 <a 
-                  href={getWhatsAppLink("Hola, quiero ver cómo funciona Barber Pro.")}
+                  href={getWhatsAppLink("Hola 👋 Me gustaría ver una demostración en mi celular.")}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="bg-amber-500 hover:bg-amber-400 text-black text-lg font-bold py-4 px-8 rounded-xl transition-all transform hover:scale-105 shadow-[0_0_30px_rgba(245,158,11,0.3)] flex items-center justify-center gap-2 w-full sm:w-auto"
                 >
                   Ver Demo en Vivo <ChevronRight size={20} />
@@ -285,34 +304,32 @@ const App = () => {
           </div>
 
           <div className="relative hidden lg:block">
-            <FadeIn delay={200} className="relative z-10">
-              <div className="bg-gradient-to-b from-slate-800 to-slate-900 rounded-[2.5rem] p-4 border border-slate-700 shadow-2xl max-w-sm mx-auto rotate-[-3deg] hover:rotate-0 transition-all duration-700">
-                <div className="bg-black rounded-[2rem] overflow-hidden border border-slate-800 h-[600px] relative">
-                  <div className="absolute top-0 w-full h-20 bg-slate-900/90 backdrop-blur z-20 flex items-center px-6 border-b border-slate-800">
-                    <div className="w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center font-bold text-black">B</div>
-                    <div className="ml-3">
-                      <p className="text-white font-bold text-sm">Barber Pro</p>
-                      <p className="text-green-500 text-xs">En línea</p>
-                    </div>
+            <div className="relative z-10 bg-gradient-to-b from-slate-800 to-slate-900 rounded-[2.5rem] p-4 border border-slate-700 shadow-2xl max-w-sm mx-auto rotate-[-3deg] hover:rotate-0 transition-all duration-700">
+              <div className="bg-black rounded-[2rem] overflow-hidden border border-slate-800 h-[600px] relative">
+                <div className="absolute top-0 w-full h-20 bg-slate-900/90 backdrop-blur z-20 flex items-center px-6 border-b border-slate-800">
+                  <div className="w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center font-bold text-black">B</div>
+                  <div className="ml-3">
+                    <p className="text-white font-bold text-sm">Barber Pro</p>
+                    <p className="text-green-500 text-xs">En línea</p>
                   </div>
-                  <div className="p-6 pt-24 space-y-4">
-                    <div className="bg-slate-800 text-slate-200 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-sm">
-                      👋 ¡Hola! Bienvenido a Barbería El Patrón. ¿En qué te puedo ayudar hoy?
-                    </div>
-                    <div className="bg-amber-500 text-black font-medium p-3 rounded-2xl rounded-tr-none max-w-[85%] ml-auto text-sm">
-                      Quiero agendar un corte para mañana.
-                    </div>
-                    <div className="bg-slate-800 text-slate-200 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-sm">
-                      ¡Claro! Tengo estos horarios disponibles:
-                      <br/>- 10:00 AM
-                      <br/>- 03:30 PM
-                      <br/>¿Cuál prefieres? 💈
-                    </div>
-                  </div>
-                  <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-black to-transparent z-10"></div>
                 </div>
+                <div className="p-6 pt-24 space-y-4">
+                  <div className="bg-slate-800 text-slate-200 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-sm">
+                    👋 ¡Hola! Bienvenido a Barbería El Patrón. ¿En qué te puedo ayudar hoy?
+                  </div>
+                  <div className="bg-amber-500 text-black font-medium p-3 rounded-2xl rounded-tr-none max-w-[85%] ml-auto text-sm">
+                    Quiero agendar un corte para mañana.
+                  </div>
+                  <div className="bg-slate-800 text-slate-200 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-sm">
+                    ¡Claro! Tengo estos horarios disponibles:
+                    <br/>- 10:00 AM
+                    <br/>- 03:30 PM
+                    <br/>¿Cuál prefieres? 💈
+                  </div>
+                </div>
+                <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-black to-transparent z-10"></div>
               </div>
-            </FadeIn>
+            </div>
           </div>
         </div>
       </header>
@@ -432,7 +449,9 @@ const App = () => {
              <div className="relative w-full max-w-4xl mx-auto aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border-4 border-white mb-8 group">
                 <video 
                   className="w-full h-full object-cover" 
-                  controls 
+                  controls
+                  playsInline
+                  preload="metadata"
                   // IMAGEN DE PORTADA ACTUALIZADA (Más estilo Barber)
                   poster="https://images.unsplash.com/photo-1621605815971-fbc98d665033?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
                 >
@@ -473,7 +492,9 @@ const App = () => {
 
               <div className="flex flex-col md:flex-row justify-center items-center gap-6">
                 <a 
-                  href={getWhatsAppLink("Hola, quiero probar Barber Pro en mi negocio.")}
+                  href={getWhatsAppLink("Hola 👋 Quiero ver una demostración de Barber Pro.")}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-full md:w-auto bg-[#25D366] hover:bg-[#20bd5a] text-white text-xl font-bold py-5 px-10 rounded-xl shadow-xl shadow-green-600/20 flex items-center justify-center gap-3 transition-all transform hover:-translate-y-1"
                 >
                   <WhatsAppIcon className="w-8 h-8 fill-current" />
@@ -504,6 +525,8 @@ const App = () => {
       {/* --- BOTÓN FLOTANTE PRINCIPAL --- */}
       <a 
         href={getWhatsAppLink("Hola 👋 Tengo una consulta sobre Barber Pro.")}
+        target="_blank"
+        rel="noopener noreferrer"
         className="fixed bottom-6 right-6 bg-[#25D366] hover:bg-[#20bd5a] text-white p-4 rounded-full shadow-2xl z-40 transition-transform hover:scale-110 flex items-center justify-center animate-bounce-slow"
         aria-label="Contactar por WhatsApp"
       >
@@ -514,7 +537,7 @@ const App = () => {
   );
 };
 
-// --- Componentes Reutilizables ---
+// --- Componentes Reutilizables con Tipos ---
 
 const ProblemCard = ({ icon, title, desc }: ProblemCardProps) => (
   <div className="bg-slate-50 p-8 rounded-2xl border border-slate-100 hover:shadow-xl hover:border-amber-200 hover:-translate-y-1 transition-all duration-300 group">
@@ -528,12 +551,15 @@ const ProblemCard = ({ icon, title, desc }: ProblemCardProps) => (
   </div>
 );
 
-const FeatureRow = ({ title }: FeatureRowProps) => (
+const FeatureRow = ({ title, desc }: FeatureRowProps) => (
   <div className="flex items-center gap-3 bg-slate-800/50 p-4 rounded-xl border border-slate-700 hover:border-amber-500/50 transition-colors">
     <div className="bg-amber-500/10 p-1.5 rounded text-amber-500 flex-shrink-0">
       <CheckCircle size={20} />
     </div>
-    <span className="font-medium text-slate-200 text-sm md:text-base">{title}</span>
+    <div className="flex flex-col">
+        <span className="font-medium text-slate-200 text-sm md:text-base">{title}</span>
+        {desc && <span className="text-slate-400 text-xs">{desc}</span>}
+    </div>
   </div>
 );
 
